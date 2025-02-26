@@ -1,5 +1,4 @@
 Make sure to check start dir of webserver
-
 Installing Apache/httpd - Web Server
 
 sudo dnf install -y httpd
@@ -14,6 +13,24 @@ firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --reload
 firewall-cmd --query-port=80/tcp
 
+Creating Home Page - Web Server
+
+Default location
+/var/www/html
+Create index.html
+
+<html>
+<head>
+<title>
+Hello
+</title>
+</head>
+<body>
+ <p>Hello, World!</p>
+</body>
+</html>
+
+Systemctl restart httpd
 
 Setting Up CA - CA SERVER
 sudo dnf install openssl
@@ -109,8 +126,8 @@ sudo systemctl restart httpd
 
 
 Important other
-Default location
-/var/www/html
+
+
 
 Starting service
 systemctl start httpd
@@ -122,3 +139,7 @@ Ifconfig
 Only on physical VM, to start network and setup IP
 sudo nmcli device connect eth0
 sudo systemctl enable –noew NetworkManager
+
+https://raw.githubusercontent.com/ryanrogo/SEC-260/refs/heads/main/how_to.txt
+
+https://github.com/ryanrogo/SEC-260/blob/main/how_to.txt
