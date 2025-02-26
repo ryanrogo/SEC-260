@@ -1,0 +1,124 @@
+Make sure to check start dir of webserver
+
+Installing Apache/httpd - Web Server
+
+sudo dnf install -y httpd
+sudo dnf install openssl
+
+Enable the HTTP Daemon to start on boot && start the Apache service && check its status
+
+systemctl enable httpd && systemctl start httpd && systemctl status httpd | grep -i “active”
+
+Allow HTTP through the firewall
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --reload
+firewall-cmd --query-port=80/tcp
+
+
+Setting Up CA - CA SERVER
+sudo dnf install openssl
+
+Creating directories
+mkdir ~/CA
+cd ~/CA
+
+Creating CA private key
+openssl genrsa -out ca.key 4096
+
+
+Generate CA self signed cert
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt -subj ‘/CN=Joyce310/O=Joyce310/OU=Joyce310/C=US’
+
+Configure OpenSSL for CA
+Use vi to “openssl.cnf”
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+certs = ./certs
+crl_dir = ./crl
+database = ./index.txt
+new_certs_dir = ./newcerts
+certificate = ./ca.crt
+serial = ./serial
+private_key = ca.key
+default_days = 365
+default_md = sha256
+policy = policy_any
+x509_extensions = v3_ca
+
+[ policy_any ]
+countryName = optional
+stateOrProvinceName = optional
+localityName = optional
+organizationName = optional
+organizationalUnitName = optional
+commonName = supplied
+emailAddress = optional
+
+[ v3_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = CA:true
+
+Creating files and directories
+mkdir certs crl newcerts
+touch index.txt
+echo “01” > serial
+Generate Certificate Request - Web Server
+Make sure openssl is installed
+
+openssl genrsa -out websrv.key 2048
+openssl req -new -key websrv.key -out websrv.csr -subj ‘/CN=Joyce310/O=Joyce310/OU=Joyce310/C=US’
+
+
+Signing CA Request - CA Server
+scp user@ip_addr:/path/to/websrv.csr ~/CA
+
+Sign the CSR
+openssl ca -config openssl.cnf -in websvr.csr -out websrv.crt -days 365
+
+Transfer Signed Cert to Host - Web Server
+scp user@ip_addr:/path/to/CA/websrv.crt /root
+
+Copy the certificate and key files:
+
+cp websrv.crt /etc/pki/tls/certs/
+cp websrv.key /etc/pki/tls/private/
+
+sudo dnf install mod_ssl
+
+Update Config file
+vi /etc/httpd/conf.d/ssl.conf
+
+
+
+
+Locate and modify these lines:
+
+SSLCertificateFile /etc/pki/tls/certs/websrv.crt
+SSLCertificateKeyFile /etc/pki/tls/private/websrv.key
+
+
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --reload
+
+sudo systemctl restart httpd
+
+
+
+
+Important other
+Default location
+/var/www/html
+
+Starting service
+systemctl start httpd
+
+Ifconfig
+/etc/httpd/conf/httpd.conf 
+
+
+Only on physical VM, to start network and setup IP
+sudo nmcli device connect eth0
+sudo systemctl enable –noew NetworkManager
