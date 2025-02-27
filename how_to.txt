@@ -141,6 +141,32 @@ sudo nmcli device connect eth0
 sudo systemctl enable –noew NetworkManager
 
 
+sudo nano /etc/httpd/conf.d/ssl.conf
+
+
+<VirtualHost *:80>
+    ServerName 10.0.17.8
+    Redirect permanent / https://10.0.17.8/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName 10.0.17.8
+    DocumentRoot /var/www/html
+
+    SSLEngine on
+    SSLCertificateFile /etc/pki/tls/certs/websrv.crt
+    SSLCertificateKeyFile /etc/pki/tls/private/websrv.key
+
+    <Directory "/var/www/html">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+sudo systemctl restart httpd
+
+
+
 curl -I https://raw.githubusercontent.com/ryanrogo/SEC-260/refs/heads/main/how_to.txt
 
 
