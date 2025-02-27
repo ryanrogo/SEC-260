@@ -148,3 +148,11 @@ curl -I https://raw.githubusercontent.com/ryanrogo/SEC-260/refs/heads/main/how_t
 https://raw.githubusercontent.com/ryanrogo/SEC-260/refs/heads/main/how_to.txt
 
 https://github.com/ryanrogo/SEC-260/blob/main/how_to.txt
+
+USING LYNX
+dnf install -y dnf-plugins-core Links to an external site. 
+dnf install -y epel-release Links to an external site.
+dnf config-manager Links to an external site. --set-enabled powertools
+dnf update -y   (this will take a bit, so launch and enjoy snack time)
+dnf install -y lynx Links to an external site.
+lynx http://Your_IP_Here
